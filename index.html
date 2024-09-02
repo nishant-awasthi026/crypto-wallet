@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Simple Crypto Wallet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <script defer type="module" src="main.js"></script>
+</head>
+<body>
+    <div class="container">
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <b>Select Cryptocurrency:</b>
+                        <select id="cryptoSelect" class="form-select">
+                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="BTC">Bitcoin (BTC)</option>
+                            <option value="LTC">Litecoin (LTC)</option>
+                        </select>
+                        <br>
+                        <b>Balance:</b><br>
+                        <h2>
+                        <span id="balance">100</span> <span id="cryptoSymbol">ETH</span>
+                        </h2>
+                    </div>
+                </div>
+                <br>
+                <div style="text-align: center;">
+                    <button id="createnew" class="btn btn-success">Create new wallet</button>
+                    <button id="updatebal" class="btn btn-info">Update balance</button>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <b>Your address:</b><br>
+                        <div id="addr"></div><br>
+                        <b>Private key:</b><br>
+                        <div id="private"></div><br>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <b>Import private key:</b><br>
+                        <form>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="Enter private key here" id="privateKeyImport">
+                                <button id="importwal" type="button" class="btn btn-outline-secondary">Import</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <b>Reward System</b>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p>Level: <span id="level">1</span></p>
+                                <p>Experience: <span id="experience">0</span>/100</p>
+                            </div>
+                            <div style="width: 50%;">
+                                <div class="progress">
+                                    <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <b>Swap Cryptocurrency</b>
+                        <div class="input-group mb-3">
+                            <select id="fromCrypto" class="form-select">
+                                <option value="ETH">Ethereum (ETH)</option>
+                                <option value="BTC">Bitcoin (BTC)</option>
+                                <option value="LTC">Litecoin (LTC)</option>
+                            </select>
+                            <input type="number" id="swapAmount" class="form-control" placeholder="Amount to swap">
+                            <select id="toCrypto" class="form-select">
+                                <option value="BTC">Bitcoin (BTC)</option>
+                                <option value="ETH">Ethereum (ETH)</option>
+                                <option value="LTC">Litecoin (LTC)</option>
+                            </select>
+                        </div>
+                        <button id="swapButton" class="btn btn-primary">Swap</button>
+                        <div id="swapResult" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
+
+    <script>
+        const balances = {
+            ETH: 100,
+            BTC: 1,
+            LTC: 50
+        };
+
+        const exchangeRates = {
+            ETH: {'BTC': 0.06, 'LTC': 150},
+            BTC: {'ETH': 16.67, 'LTC': 2500},
+            LTC: {'ETH': 0.00667, 'BTC': 0.0004}
+        };
+
+        const rewardSystem = {
+            level: 1,
+            experience: 0,
+            experienceToNextLevel: 100
+        };
+
+        document.getElementById('cryptoSelect').addEventListener('change', function() {
+            const selectedCrypto = this.value;
+            document.getElementById('balance').innerText = balances[selectedCrypto];
+            document.getElementById('cryptoSymbol').innerText = selectedCrypto;
+        });
+
+        document.getElementById('createnew').addEventListener('click', function() {
+            alert('Create new wallet functionality not implemented');
+        });
+
+        document.getElementById('updatebal').addEventListener('click', function() {
+            alert('Update balance functionality not implemented');
+        });
+
+        document.getElementById('importwal').addEventListener('click', function() {
+            alert('Import wallet functionality not implemented');
+        });
+
+        document.getElementById('swapButton').addEventListener('click', function() {
+            const fromCrypto = document.getElementById('fromCrypto').value;
+            const toCrypto = document.getElementById('toCrypto').value;
+            const amount = parseFloat(document.getElementById('swapAmount').value);
+            const result = swapCrypto(fromCrypto, toCrypto, amount);
+            document.getElementById('swapResult').innerText = result;
+        });
+
+        function swapCrypto(fromCrypto, toCrypto, amount) {
+            if (amount <= 0 || !balances[fromCrypto] || !exchangeRates[fromCrypto][toCrypto]) {
+                return 'Invalid swap request.';
+            }
+            if (balances[fromCrypto] < amount) {
+                return 'Insufficient balance.';
+            }
+            const rate = exchangeRates[fromCrypto][toCrypto];
+            const swappedAmount = amount * rate;
+
+            // Update balances
+            balances[fromCrypto] -= amount;
+            balances[toCrypto] = (balances[toCrypto] || 0) + swappedAmount;
+
+            // Update displayed balance
+            document.getElementById('balance').innerText = balances[document.getElementById('cryptoSelect').value];
+            return `Swapped ${amount} ${fromCrypto} for ${swappedAmount.toFixed(4)} ${toCrypto}.`;
+        }
+
+        function updateRewardSystem(experienceGained) {
+            rewardSystem.experience += experienceGained;
+            if (rewardSystem.experience >= rewardSystem.experienceToNextLevel) {
+                rewardSystem.level++;
+                rewardSystem.experience -= rewardSystem.experienceToNextLevel;
+                rewardSystem.experienceToNextLevel *= 2; // Increase the experience needed for next level
+            }
+            document.getElementById('level').innerText = rewardSystem.level;
+            document.getElementById('experience').innerText = rewardSystem.experience;
+
+            const progressPercentage = (rewardSystem.experience / rewardSystem.experienceToNextLevel) * 100;
+            document.getElementById('progressBar').style.width = progressPercentage + '%';
+            document.getElementById('progressBar').innerText = Math.floor(progressPercentage) + '%';
+        }
+
+        // Example of gaining experience
+        updateRewardSystem(20); // Call this function whenever experience is gained
+    </script>
+</body>
+</html>
